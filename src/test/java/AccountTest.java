@@ -18,7 +18,8 @@ public class AccountTest {
     private AccountPage accountPage;
     WebDriver driver;
 
-    @BeforeMethod
+
+    @BeforeMethod (description = "Chrome ბრაუზერის გახსნა, თაიმ აუთების გაწერა, მისამართზე შესვლა, კლასების ინიციალიზაცია")
     public void setUp() {
         driver = new ChromeDriver();
         driver.manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
@@ -29,8 +30,8 @@ public class AccountTest {
         homePage = new HomePage(driver);
         accountPage = new AccountPage(driver);
     }
-private void loginHarryPotter() throws InterruptedException{
-        Thread.sleep(1000);
+private void loginHarryPotter() throws InterruptedException {
+    Thread.sleep(1000);
     homePage.loginAsCustomer();
     Thread.sleep(1000);
     customerLoginPage.selectUserName("Harry Potter");
@@ -40,11 +41,11 @@ private void loginHarryPotter() throws InterruptedException{
     Thread.sleep(1000);
 
 }
-    @Test
+    @Test (description = "ჰარი პოტერის დალოგინება")
     public void loginTest() throws InterruptedException {
         loginHarryPotter();
     }
-   @Test
+   @Test (description = "ანგარიშზე თანხის შეტანა")
     public void depositTest() throws InterruptedException{
         loginHarryPotter();
 
@@ -54,8 +55,8 @@ private void loginHarryPotter() throws InterruptedException{
         double currentTotalAmount = accountPage.getTotalBalance();
         Assert.assertEquals(currentTotalAmount,expectedAmount);
     }
-    @Test
-    public void withDrawlTest() throws InterruptedException{
+    @Test (description = "ანგარიშიდან თანხის გამოტანა")
+    public void withdrawlTest() throws InterruptedException{
         loginHarryPotter();
         double totalBalance = accountPage.getTotalBalance();
         accountPage.goBack();
@@ -70,7 +71,65 @@ private void loginHarryPotter() throws InterruptedException{
         double currentTotalAmount = accountPage.getTotalBalance();
         Assert.assertEquals(currentTotalAmount,expectedAmount);
     }
-    @AfterMethod
+
+   @Test (description = "ანგარიშზე უარყოფითი თანხის დამატება")
+    public void addNegativeAmountTest() throws InterruptedException{
+        loginHarryPotter();
+        double totalBalance = accountPage.getTotalBalance();
+        accountPage.goBack();
+        accountPage.deposit(-depositAmount);
+        double newBalance = accountPage.getTotalBalance();
+        Assert.assertEquals(newBalance,totalBalance);
+    }
+
+    @Test (description = "ანგარიშიდან 0 თანხის გამოტანა")
+    public void withdrawZeroBalanceTest() throws InterruptedException{
+        loginHarryPotter();
+        double totalBalance = accountPage.getTotalBalance();
+        if(totalBalance !=0)
+        {
+            accountPage.withdrawl(totalBalance);
+        }
+        accountPage.goBack();
+        accountPage.withdrawl(withdrawAmount);
+        double newBalance = accountPage.getTotalBalance();
+        Assert.assertEquals(newBalance, 0);
+        Assert.assertEquals(newBalance,totalBalance);
+    }
+    @Test (description = "ანგარიშიდან უარყოფითი თანხის გამოტანა")
+    public void withdrawNegativeAmountTest() throws InterruptedException{
+        loginHarryPotter();
+        double totalBalance = accountPage.getTotalBalance();
+        accountPage.goBack();
+        accountPage.withdrawl(-withdrawAmount);
+        double newBalance = accountPage.getTotalBalance();
+        Assert.assertEquals(newBalance,totalBalance);
+    }
+@Test (description = "მომხმარებლის ანგარიშიდან გამოსვლა")
+public void logOutTest() throws InterruptedException {
+        loginHarryPotter();
+        accountPage.logOut();
+    String currentUrl = driver.getCurrentUrl();
+    Assert.assertTrue(currentUrl.endsWith("customer"));
+}
+@Test(description = "არჩეული მომხმარებლის სახელის გამოტანა")
+public void welcomePageFullNameTest() throws InterruptedException{
+        loginHarryPotter();
+        accountPage.welcomePageFullName();
+        String welcomePageFullName =accountPage.welcomePageFullName();
+        Assert.assertEquals(welcomePageFullName, "Harry Potter");
+
+}
+@Test(description = "მომხმარებლის ანგარიშის ნომრის ასახვა")
+public void accountNumberChangeTest () throws InterruptedException{
+        loginHarryPotter();
+        accountPage.changeAccountNumber("1004");
+       String accountNumber= accountPage.getAccountNumber();
+       Assert.assertEquals(accountNumber,"1004");
+
+}
+
+    @AfterMethod (description = "Chrome ბრაუზერის დახურვა")
     public void tearDown(){
         driver.quit();
     }
