@@ -44,6 +44,8 @@ private void loginHarryPotter() throws InterruptedException {
     @Test (description = "ჰარი პოტერის დალოგინება")
     public void loginTest() throws InterruptedException {
         loginHarryPotter();
+        boolean contains = driver.getCurrentUrl().endsWith("account");
+        Assert.assertTrue(contains);
     }
    @Test (description = "ანგარიშზე თანხის შეტანა")
     public void depositTest() throws InterruptedException{
@@ -82,7 +84,7 @@ private void loginHarryPotter() throws InterruptedException {
         Assert.assertEquals(newBalance,totalBalance);
     }
 
-    @Test (description = "ანგარიშიდან 0 თანხის გამოტანა")
+    @Test (description = "ნულოვანი ანგარიშიდან თანხის გამოტანა")
     public void withdrawZeroBalanceTest() throws InterruptedException{
         loginHarryPotter();
         double totalBalance = accountPage.getTotalBalance();
